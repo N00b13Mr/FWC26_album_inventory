@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#1d4ed8">
+<title>My Panini World Cup 2026 Album</title>
+<style>
+  :root{
+    --blue:#1d4ed8; --blue-d:#1e3a8a; --green:#16a34a; --green-l:#dcfce7;
+    --gray:#e5e7eb; --gray-d:#9ca3af; --ink:#1f2937; --orange:#f97316;
+    --gold:#f59e0b; --bg:#f1f5f9; --card:#ffffff; --red:#dc2626;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0; padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    background:var(--bg); color:var(--ink);
+    max-width:600px; margin:0 auto; padding-bottom:84px;
+  }
+  /* ---- Header ---- */
+  header{
+    background:linear-gradient(135deg,var(--blue),var(--blue-d));
+    color:#fff; padding:14px 16px 16px; position:sticky; top:0; z-index:20;
+    box-shadow:0 2px 10px rgba(0,0,0,.15);
+  }
+  header h1{margin:0; font-size:19px; font-weight:800;}
+  header .sub{font-size:12px; opacity:.85; margin-top:1px;}
+  .progwrap{margin-top:10px;}
+  .progbar{background:rgba(255,255,255,.25); border-radius:20px; height:20px; overflow:hidden;}
+  .progfill{background:var(--green); height:100%; width:0%; border-radius:20px; transition:width .35s;}
+  .progtext{font-size:13px; font-weight:700; margin-top:5px; display:flex; justify-content:space-between;}
+  /* ---- Views ---- */
+  .view{display:none; padding:12px;}
+  .view.active{display:block;}
+  /* ---- Controls ---- */
+  .toolbar{display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap;}
+  .searchrow{display:flex; gap:6px; margin-bottom:8px;}
+  .searchrow input{flex:1; font-size:16px; padding:10px; border:2px solid var(--gray);
+    border-radius:12px; min-width:0;}
+  .btn{border:none; border-radius:12px; padding:10px 14px; font-size:15px; font-weight:700;
+    cursor:pointer; background:var(--blue); color:#fff;}
+  .btn.sec{background:var(--gray); color:var(--ink);}
+  .btn.green{background:var(--green);}
+  .btn.org{background:var(--orange);}
+  .btn.red{background:var(--red);}
+  .btn:active{transform:scale(.96);}
+  .filters{display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px;}
+  .fchip{border:2px solid var(--gray); background:#fff; border-radius:20px;
+    padding:6px 12px; font-size:13px; font-weight:700; cursor:pointer; color:#475569;}
+  .fchip.on{background:var(--blue); color:#fff; border-color:var(--blue);}
+  /* ---- Section ---- */
+  .section{background:var(--card); border-radius:14px; margin-bottom:10px; overflow:hidden;
+    box-shadow:0 1px 4px rgba(0,0,0,.07);}
+  .sechead{display:flex; align-items:center; gap:8px; padding:12px; cursor:pointer;}
+  .sechead .arrow{font-size:13px; color:var(--gray-d); transition:transform .2s;}
+  .section.open .sechead .arrow{transform:rotate(90deg);}
+  .sechead .name{font-weight:800; font-size:15px; flex:1; min-width:0;}
+  .sechead .range{font-size:11px; color:var(--gray-d); font-weight:600;}
+  .sechead .edit{background:none; border:none; font-size:15px; cursor:pointer; padding:2px 4px;}
+  .secprog{font-size:12px; font-weight:800; background:var(--gray); color:#475569;
+    padding:4px 9px; border-radius:20px; white-space:nowrap;}
+  .secprog.done{background:var(--green-l); color:var(--green);}
+  .secbody{display:none; padding:0 10px 12px;}
+  .section.open .secbody{display:block;}
+  .cokebox{background:#fef3c7; color:#92400e; font-size:12px; font-weight:600;
+    padding:8px 10px; border-radius:10px; margin-bottom:10px;}
+  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(62px,1fr)); gap:7px;}
+  /* ---- Chip ---- */
+  .chip{position:relative; aspect-ratio:1/1; border:2px solid var(--gray);
+    background:#f8fafc; border-radius:12px; cursor:pointer; display:flex;
+    align-items:center; justify-content:center; font-weight:800; font-size:18px;
+    color:#64748b; padding:0; font-family:inherit;}
+  .chip.owned{background:var(--green-l); border-color:var(--green); color:var(--green);}
+  .chip.flash{animation:flash .9s ease;}
+  @keyframes flash{0%,100%{box-shadow:none;}40%{box-shadow:0 0 0 4px var(--gold);}}
+  .chip .star{position:absolute; top:-7px; left:-6px; font-size:15px;}
+  .chip .spare{position:absolute; bottom:-7px; right:-6px; background:var(--orange);
+    color:#fff; font-size:11px; font-weight:800; border-radius:20px; padding:1px 6px;
+    border:2px solid #fff;}
+  .chip .info{position:absolute; top:-8px; right:-8px; width:22px; height:22px;
+    border-radius:50%; background:var(--blue); color:#fff; border:2px solid #fff;
+    font-size:12px; line-height:1; display:flex; align-items:center; justify-content:center;
+    cursor:pointer;}
+  /* ---- Bottom nav ---- */
+  nav{position:fixed; bottom:0; left:0; right:0; max-width:600px; margin:0 auto;
+    background:#fff; display:flex; border-top:1px solid var(--gray); z-index:30;}
+  nav button{flex:1; border:none; background:none; padding:8px 2px 10px; cursor:pointer;
+    font-size:11px; font-weight:700; color:var(--gray-d);}
+  nav button .ic{font-size:21px; display:block; margin-bottom:1px;}
+  nav button.on{color:var(--blue);}
+  /* ---- Modal / sheet ---- */
+  .overlay{position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:40; display:none;
+    align-items:flex-end; justify-content:center;}
+  .overlay.show{display:flex;}
+  .sheet{background:#fff; width:100%; max-width:600px; border-radius:20px 20px 0 0;
+    padding:18px 18px 26px; animation:rise .2s ease;}
+  @keyframes rise{from{transform:translateY(40px);}to{transform:translateY(0);}}
+  .sheet h3{margin:0 0 4px; font-size:20px;}
+  .sheet .sticknum{font-size:34px; font-weight:900; color:var(--blue);}
+  .stepper{display:flex; align-items:center; gap:14px; justify-content:center; margin:14px 0;}
+  .stepper button{width:54px; height:54px; border-radius:50%; border:none; font-size:26px;
+    font-weight:900; color:#fff; cursor:pointer;}
+  .stepper .have{font-size:18px; font-weight:800; min-width:120px; text-align:center;}
+  .starbtn{width:100%; padding:13px; border-radius:12px; border:2px solid var(--gold);
+    background:#fff; color:var(--gold); font-weight:800; font-size:15px; cursor:pointer;
+    margin-bottom:8px;}
+  .starbtn.on{background:var(--gold); color:#fff;}
+  /* ---- Stats ---- */
+  .statgrid{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;}
+  .stat{background:var(--card); border-radius:14px; padding:14px; text-align:center;
+    box-shadow:0 1px 4px rgba(0,0,0,.07);}
+  .stat .big{font-size:28px; font-weight:900; color:var(--blue);}
+  .stat .lbl{font-size:12px; color:var(--gray-d); font-weight:700; margin-top:2px;}
+  .card{background:var(--card); border-radius:14px; padding:14px; margin-bottom:12px;
+    box-shadow:0 1px 4px rgba(0,0,0,.07);}
+  .card h3{margin:0 0 8px; font-size:16px;}
+  .field{display:flex; align-items:center; gap:8px; margin:8px 0;}
+  .field label{flex:1; font-size:14px; font-weight:600;}
+  .field input{width:88px; font-size:16px; padding:8px; border:2px solid var(--gray);
+    border-radius:10px; text-align:center;}
+  .advice{background:#eff6ff; border-left:4px solid var(--blue); padding:10px 12px;
+    border-radius:8px; font-size:13px; font-weight:600; margin-top:8px;}
+  .minibar{background:var(--gray); border-radius:10px; height:14px; overflow:hidden; margin-top:4px;}
+  .minifill{background:var(--blue); height:100%; border-radius:10px;}
+  .seclist{display:flex; justify-content:space-between; font-size:12px; font-weight:700;
+    margin-top:9px;}
+  /* ---- Trade ---- */
+  .pill{display:inline-block; background:var(--gray); border-radius:8px; padding:4px 8px;
+    font-size:13px; font-weight:700; margin:3px 3px 0 0;}
+  .pill.star{background:#fef3c7; color:#92400e;}
+  .pill.need{background:#dbeafe; color:#1e40af;}
+  .pill.give{background:var(--green-l); color:var(--green);}
+  textarea{width:100%; font-size:13px; padding:10px; border:2px solid var(--gray);
+    border-radius:12px; font-family:monospace; resize:vertical;}
+  #myQrImg img{display:block; margin:8px auto; image-rendering:pixelated; width:230px; height:230px;}
+  .help-tip{margin-bottom:12px;}
+  .help-tip b{color:var(--blue);}
+  video{width:100%; border-radius:12px; background:#000;}
+  .emptynote{text-align:center; color:var(--gray-d); font-size:14px; padding:24px 10px;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>⚽ My World Cup 2026 Album</h1>
+  <div class="sub">Panini sticker tracker &amp; trade helper</div>
+  <div class="progwrap">
+    <div class="progbar"><div class="progfill" id="hdrFill"></div></div>
+    <div class="progtext"><span id="hdrPct">0%</span><span id="hdrCount">0 / 992</span></div>
+  </div>
+</header>
+
+<!-- ===== ALBUM ===== -->
+<div class="view active" id="view-album">
+  <div class="searchrow">
+    <input type="text" id="search" placeholder="Find a sticker by code… (e.g. ARG 10)" inputmode="text">
+    <button class="btn" onclick="doSearch()">Go</button>
+  </div>
+  <div class="filters" id="filters">
+    <button class="fchip on" data-f="all" onclick="setFilter('all')">All</button>
+    <button class="fchip" data-f="owned" onclick="setFilter('owned')">✅ Got</button>
+    <button class="fchip" data-f="need" onclick="setFilter('need')">⬜ Need</button>
+    <button class="fchip" data-f="spare" onclick="setFilter('spare')">🔁 Spares</button>
+    <button class="fchip" data-f="star" onclick="setFilter('star')">⭐ Stars</button>
+  </div>
+  <div id="sections"></div>
+</div>
+
+<!-- ===== TRADE ===== -->
+<div class="view" id="view-trade">
+  <div class="card">
+    <h3>🔄 Your trade lists</h3>
+    <div id="tradeSummary" style="font-size:14px;font-weight:700;margin-bottom:6px;"></div>
+    <div id="giveList"></div>
+    <div id="needList" style="margin-top:10px;"></div>
+  </div>
+  <div class="card">
+    <h3>📤 Share your list with a friend</h3>
+    <p style="font-size:13px;color:#475569;margin:4px 0 8px;">Show this code or QR to a friend. They scan or paste it to see what you can swap.</p>
+    <button class="btn green" onclick="showMyCode()">Show my swap code &amp; QR</button>
+    <div id="myCodeArea" style="display:none;margin-top:10px;">
+      <div id="myQrImg"></div>
+      <textarea id="myCodeText" rows="3" readonly></textarea>
+      <button class="btn sec" style="margin-top:6px;" onclick="copyCode()">📋 Copy code</button>
+    </div>
+  </div>
+  <div class="card">
+    <h3>📥 Match with a friend</h3>
+    <p style="font-size:13px;color:#475569;margin:4px 0 8px;">Scan your friend's QR, or paste their swap code here.</p>
+    <button class="btn org" id="scanBtn" onclick="startScan()">📷 Scan friend's QR</button>
+    <textarea id="friendCode" rows="3" placeholder="…or paste your friend's swap code here" style="margin-top:8px;"></textarea>
+    <button class="btn" style="margin-top:6px;" onclick="matchFromText()">🤝 Find our matches</button>
+    <div id="matchResult" style="margin-top:10px;"></div>
+  </div>
+</div>
+
+<!-- ===== STATS ===== -->
+<div class="view" id="view-stats">
+  <div class="statgrid">
+    <div class="stat"><div class="big" id="stOwned">0</div><div class="lbl">Stickers got</div></div>
+    <div class="stat"><div class="big" id="stNeed">992</div><div class="lbl">Still needed</div></div>
+    <div class="stat"><div class="big" id="stSpare">0</div><div class="lbl">Spare doubles</div></div>
+    <div class="stat"><div class="big" id="stStar">0</div><div class="lbl">⭐ Star stickers</div></div>
+  </div>
+  <div class="card">
+    <h3>💰 Pack &amp; cost tracker</h3>
+    <div class="field"><label>Packs opened</label><input type="number" id="inPacks" min="0" onchange="savePacks()"></div>
+    <div class="field"><label>Price per pack</label><input type="number" id="inPrice" min="0" step="0.05" onchange="savePacks()"></div>
+    <div class="field"><label>Currency symbol</label><input type="text" id="inCur" maxlength="3" onchange="savePacks()"></div>
+    <div style="font-size:13px;font-weight:700;margin-top:6px;" id="costLine"></div>
+    <div class="advice" id="adviceLine"></div>
+  </div>
+  <div class="card">
+    <h3>📊 Progress by section</h3>
+    <div id="secStats"></div>
+  </div>
+  <div class="card">
+    <h3>⚙️ Backup &amp; settings</h3>
+    <p style="font-size:13px;color:#475569;margin:4px 0 8px;">Your album saves automatically on this device. Make a backup file to keep it safe or move it to another device.</p>
+    <button class="btn sec" onclick="exportBackup()">💾 Save backup file</button>
+    <label class="btn sec" style="display:inline-block;">📂 Load backup<input type="file" id="importFile" accept=".json" style="display:none;" onchange="importBackup(event)"></label>
+    <button class="btn red" style="margin-top:6px;" onclick="resetAll()">🗑️ Start over</button>
+  </div>
+</div>
+
+<!-- ===== HELP ===== -->
+<div class="view" id="view-help">
+  <div class="card">
+    <h3>❓ How to use this app</h3>
+    <div class="help-tip">📦 <b>Every time you pull a sticker from a pack, tap it once.</b> First tap = you got it (turns green). Tap again if it's a double — it counts a spare!</div>
+    <div class="help-tip">ℹ️ Tap the little blue circle on a sticker to fix mistakes, add spares, or mark a ⭐ star.</div>
+    <div class="help-tip">🔤 Every sticker has a code printed on it, like <b>ARG 10</b>. Type it in the search box to jump straight there.</div>
+    <div class="help-tip">🌍 Stickers are grouped by team. Tap a team header to open it; the chip number matches the number on the sticker.</div>
+  </div>
+  <div class="card">
+    <h3>🏆 Smart collecting tips</h3>
+    <div class="help-tip">🎯 <b>The ~150 pack sweet spot.</b> Buying about 150 packs (~3 boxes) fills most of your album. After that, new stickers get rare — stop buying packs and start trading instead.</div>
+    <div class="help-tip">🥤 <b>Coca-Cola stickers.</b> The 12 special Coca-Cola stickers are NOT in normal packs. Find them under the labels of specially marked Coca-Cola bottles.</div>
+    <div class="help-tip">🔄 <b>Trade your doubles.</b> Use the Trade tab. Show your QR to a friend or scan theirs to instantly see what you can swap.</div>
+    <div class="help-tip">⭐ <b>Keep star stickers safe.</b> Mark big players and shiny stickers with a star. One star sticker can often be traded for 5–10 regular ones.</div>
+    <div class="help-tip">🏁 <b>The final 50.</b> When you need 50 stickers or fewer, you can order the exact numbers from Panini's official Missing Sticker Service.</div>
+    <div class="help-tip">📱 <b>Free option.</b> The official FIFA Panini Collection app lets you build a digital album with free packs every day.</div>
+  </div>
+  <div class="card" style="font-size:12px;color:var(--gray-d);">
+    The album holds <b>980</b> stickers — the Panini emblem, 19 World Cup History stickers, and 48 national teams of 20 each — plus <b>12</b> Coca-Cola stickers (992 total). Each sticker has its own code, like <b>ARG 10</b> (Argentina, sticker 10). Team names and codes follow the official Panini checklist.
+  </div>
+</div>
+
+<!-- ===== Bottom nav ===== -->
+<nav>
+  <button class="on" data-v="album" onclick="showView('album')"><span class="ic">📖</span>Album</button>
+  <button data-v="trade" onclick="showView('trade')"><span class="ic">🔄</span>Trade</button>
+  <button data-v="stats" onclick="showView('stats')"><span class="ic">📊</span>Stats</button>
+  <button data-v="help" onclick="showView('help')"><span class="ic">❓</span>Help</button>
+</nav>
+
+<!-- ===== Sticker detail sheet ===== -->
+<div class="overlay" id="detailOverlay" onclick="if(event.target===this)closeDetail()">
+  <div class="sheet">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;">
+      <h3 id="dTitle">Sticker</h3>
+      <span class="sticknum" id="dNum">#1</span>
+    </div>
+    <div style="font-size:13px;color:#64748b;" id="dSection"></div>
+    <div class="stepper">
+      <button style="background:var(--red)" onclick="stepDetail(-1)">−</button>
+      <div class="have" id="dHave">You don't have this yet</div>
+      <button style="background:var(--green)" onclick="stepDetail(1)">+</button>
+    </div>
+    <button class="starbtn" id="dStar" onclick="toggleDetailStar()">⭐ Mark as a star sticker</button>
+    <button class="btn sec" style="width:100%;" onclick="closeDetail()">Done</button>
+  </div>
+</div>
+
+<!-- ===== Scanner ===== -->
+<div class="overlay" id="scanOverlay" onclick="if(event.target===this)stopScan()">
+  <div class="sheet">
+    <h3>📷 Point at your friend's QR</h3>
+    <video id="scanVideo" playsinline></video>
+    <div id="scanMsg" style="font-size:13px;color:#64748b;margin:8px 0;">Looking for a code…</div>
+    <button class="btn sec" style="width:100%;" onclick="stopScan()">Cancel</button>
+  </div>
+</div>
+
+<script>
+/* ===== Self-contained QR encoder (Version 12, ECC L, byte mode) =====
+   Verified byte-identical to the qrcode-generator reference library and
+   decoded back with jsQR + OpenCV. No external dependencies. */
+function makeQR(text){
+  var COUNT=65, EC=24;
+  var BLOCKS=[[116,92],[116,92],[117,93],[117,93]];
+  var ALIGN=[6,32,58], TYPE=12;
+  var EXP=[],LOG=[];
+  (function(){var x=1;for(var i=0;i<255;i++){EXP[i]=x;x<<=1;if(x&256)x^=0x11D;}for(var i=0;i<255;i++)LOG[EXP[i]]=i;})();
+  function gmul(a,b){if(a===0||b===0)return 0;return EXP[(LOG[a]+LOG[b])%255];}
+  function genPoly(n){var g=[1];for(var i=0;i<n;i++){var c=EXP[i],ng=[];for(var k=0;k<=g.length;k++)ng[k]=0;for(var j=0;j<g.length;j++){ng[j]^=g[j];ng[j+1]^=gmul(g[j],c);}g=ng;}return g;}
+  function rsEncode(data,n){var g=genPoly(n),res=data.concat(new Array(n).fill(0));for(var i=0;i<data.length;i++){var co=res[i];if(co!==0)for(var j=0;j<=n;j++)res[i+j]^=gmul(g[j],co);}return res.slice(data.length);}
+  var bytes=[];for(var i=0;i<text.length;i++)bytes.push(text.charCodeAt(i)&0xff);
+  var bits=[];
+  function put(v,len){for(var i=len-1;i>=0;i--)bits.push((v>>i)&1);}
+  put(4,4);put(bytes.length,16);for(i=0;i<bytes.length;i++)put(bytes[i],8);
+  var totalData=0;for(i=0;i<BLOCKS.length;i++)totalData+=BLOCKS[i][1];
+  var cap=totalData*8;
+  var t=Math.min(4,cap-bits.length);for(i=0;i<t;i++)bits.push(0);
+  while(bits.length%8)bits.push(0);
+  var pads=[0xEC,0x11],pi=0;
+  while(bits.length<cap){put(pads[pi],8);pi^=1;}
+  var dcw=[];for(i=0;i<bits.length;i+=8){var v=0;for(var j=0;j<8;j++)v=(v<<1)|bits[i+j];dcw.push(v);}
+  var blocks=[],off=0;
+  for(var bi=0;bi<BLOCKS.length;bi++){var dc=BLOCKS[bi][1],d=dcw.slice(off,off+dc);off+=dc;blocks.push({d:d,ec:rsEncode(d,EC)});}
+  var inter=[],maxD=0;
+  for(i=0;i<blocks.length;i++)maxD=Math.max(maxD,blocks[i].d.length);
+  for(i=0;i<maxD;i++)for(bi=0;bi<blocks.length;bi++)if(i<blocks[bi].d.length)inter.push(blocks[bi].d[i]);
+  for(i=0;i<EC;i++)for(bi=0;bi<blocks.length;bi++)inter.push(blocks[bi].ec[i]);
+  function bchDigit(d){var n=0;while(d!=0){n++;d>>>=1;}return n;}
+  function bchTypeNumber(data){var d=data<<12;while(bchDigit(d)-bchDigit(0x1F25)>=0)d^=(0x1F25<<(bchDigit(d)-bchDigit(0x1F25)));return (data<<12)|d;}
+  function bchTypeInfo(data){var d=data<<10;while(bchDigit(d)-bchDigit(0x537)>=0)d^=(0x537<<(bchDigit(d)-bchDigit(0x537)));return ((data<<10)|d)^0x5412;}
+  function maskFunc(p){return [
+    function(i,j){return (i+j)%2==0;},function(i,j){return i%2==0;},
+    function(i,j){return j%3==0;},function(i,j){return (i+j)%3==0;},
+    function(i,j){return (Math.floor(i/2)+Math.floor(j/3))%2==0;},
+    function(i,j){return (i*j)%2+(i*j)%3==0;},
+    function(i,j){return ((i*j)%2+(i*j)%3)%2==0;},
+    function(i,j){return ((i*j)%3+(i+j)%2)%2==0;}][p];}
+  function build(mask){
+    var m=[];for(var r=0;r<COUNT;r++){m[r]=[];for(var c=0;c<COUNT;c++)m[r][c]=null;}
+    function probe(row,col){for(var r=-1;r<=7;r++){if(row+r<=-1||COUNT<=row+r)continue;for(var c=-1;c<=7;c++){if(col+c<=-1||COUNT<=col+c)continue;m[row+r][col+c]=(0<=r&&r<=6&&(c==0||c==6))||(0<=c&&c<=6&&(r==0||r==6))||(2<=r&&r<=4&&2<=c&&c<=4);}}}
+    probe(0,0);probe(COUNT-7,0);probe(0,COUNT-7);
+    for(var i=0;i<ALIGN.length;i++)for(var j=0;j<ALIGN.length;j++){var rr=ALIGN[i],cc=ALIGN[j];if(m[rr][cc]!=null)continue;for(var dr=-2;dr<=2;dr++)for(var dc=-2;dc<=2;dc++)m[rr+dr][cc+dc]=(dr==-2||dr==2||dc==-2||dc==2||(dr==0&&dc==0));}
+    for(var r=8;r<COUNT-8;r++)if(m[r][6]==null)m[r][6]=(r%2==0);
+    for(var c=8;c<COUNT-8;c++)if(m[6][c]==null)m[6][c]=(c%2==0);
+    var vb=bchTypeNumber(TYPE);
+    for(i=0;i<18;i++){var b=((vb>>i)&1)==1;m[Math.floor(i/3)][i%3+COUNT-11]=b;m[i%3+COUNT-11][Math.floor(i/3)]=b;}
+    var fb=bchTypeInfo((1<<3)|mask);
+    for(i=0;i<15;i++){var b=((fb>>i)&1)==1;
+      if(i<6)m[i][8]=b;else if(i<8)m[i+1][8]=b;else m[COUNT-15+i][8]=b;
+      if(i<8)m[8][COUNT-i-1]=b;else if(i<9)m[8][15-i]=b;else m[8][15-i-1]=b;}
+    m[COUNT-8][8]=true;
+    var mf=maskFunc(mask),inc=-1,row=COUNT-1,bitIndex=7,byteIndex=0;
+    for(var col=COUNT-1;col>0;col-=2){
+      if(col==6)col-=1;
+      while(true){
+        for(var c2=0;c2<2;c2++){
+          if(m[row][col-c2]==null){
+            var dark=false;
+            if(byteIndex<inter.length)dark=(((inter[byteIndex]>>>bitIndex)&1)==1);
+            if(mf(row,col-c2))dark=!dark;
+            m[row][col-c2]=dark;bitIndex--;
+            if(bitIndex==-1){byteIndex++;bitIndex=7;}
+          }
+        }
+        row+=inc;
+        if(row<0||COUNT<=row){row-=inc;inc=-inc;break;}
+      }
+    }
+    return m;
+  }
+  function lost(m){
+    var n=COUNT,lp=0,r,c;
+    for(r=0;r<n;r++)for(c=0;c<n;c++){var sc=0,dk=m[r][c];for(var dr=-1;dr<=1;dr++){if(r+dr<0||n<=r+dr)continue;for(var dc=-1;dc<=1;dc++){if(c+dc<0||n<=c+dc||(dr==0&&dc==0))continue;if(dk==m[r+dr][c+dc])sc++;}}if(sc>5)lp+=(3+sc-5);}
+    for(r=0;r<n-1;r++)for(c=0;c<n-1;c++){var ct=0;if(m[r][c])ct++;if(m[r+1][c])ct++;if(m[r][c+1])ct++;if(m[r+1][c+1])ct++;if(ct==0||ct==4)lp+=3;}
+    for(r=0;r<n;r++)for(c=0;c<n-6;c++){if(m[r][c]&&!m[r][c+1]&&m[r][c+2]&&m[r][c+3]&&m[r][c+4]&&!m[r][c+5]&&m[r][c+6])lp+=40;}
+    for(c=0;c<n;c++)for(r=0;r<n-6;r++){if(m[r][c]&&!m[r+1][c]&&m[r+2][c]&&m[r+3][c]&&m[r+4][c]&&!m[r+5][c]&&m[r+6][c])lp+=40;}
+    var dk2=0;for(c=0;c<n;c++)for(r=0;r<n;r++)if(m[r][c])dk2++;
+    lp+=Math.abs(100*dk2/n/n-50)/5*10;
+    return lp;
+  }
+  var best=null,bp=Infinity;
+  for(var mk=0;mk<8;mk++){var mm=build(mk),pp=lost(mm);if(pp<bp){bp=pp;best=mm;}}
+  return best;
+}
+function qrDataURL(text,scale,quiet){
+  var m=makeQR(text), n=m.length, dim=(n+2*quiet)*scale;
+  var cv=document.createElement("canvas"); cv.width=dim; cv.height=dim;
+  var ctx=cv.getContext("2d");
+  ctx.fillStyle="#ffffff"; ctx.fillRect(0,0,dim,dim);
+  ctx.fillStyle="#000000";
+  for(var r=0;r<n;r++)for(var c=0;c<n;c++) if(m[r][c])
+    ctx.fillRect((quiet+c)*scale,(quiet+r)*scale,scale,scale);
+  return cv.toDataURL();
+}
+</script>
+<script>
+"use strict";
+/* ============ DATA MODEL ============ */
+var TOTAL = 992;          // 980 album stickers + 12 Coca-Cola
+var STORE_KEY = "panini26_v1";
+
+var state = {counts:{}, stars:{}, teams:{}, collapsed:{}, packs:0, price:1, currency:"$"};
+
+function load(){
+  try{
+    var raw = localStorage.getItem(STORE_KEY);
+    if(raw){ var o = JSON.parse(raw);
+      state.counts = o.counts||{}; state.stars = o.stars||{}; state.teams = o.teams||{};
+      state.collapsed = o.collapsed||{}; state.packs = o.packs||0;
+      state.price = (o.price!=null?o.price:1); state.currency = o.currency||"$";
+    }
+  }catch(e){}
+}
+function save(){
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){}
+}
+
+function getCount(i){ return state.counts[i]||0; }
+function setCount(i,v){
+  v = Math.max(0,v|0);
+  if(v===0) delete state.counts[i]; else state.counts[i]=v;
+}
+function isStar(i){ return !!state.stars[i]; }
+
+/* ----- official album structure (team list & codes: scanini.app checklist) ----- */
+var SECTION_DEFS = [
+  {name:"Panini",                code:"PANINI", flag:"🏆", size:1,  type:"special"},
+  {name:"World Cup History",     code:"FWC",    flag:"📖", size:19, type:"special"},
+  {name:"Algeria",               code:"ALG", flag:"🇩🇿", size:20, type:"team"},
+  {name:"Argentina",             code:"ARG", flag:"🇦🇷", size:20, type:"team"},
+  {name:"Australia",             code:"AUS", flag:"🇦🇺", size:20, type:"team"},
+  {name:"Austria",               code:"AUT", flag:"🇦🇹", size:20, type:"team"},
+  {name:"Belgium",               code:"BEL", flag:"🇧🇪", size:20, type:"team"},
+  {name:"Bosnia and Herzegovina",code:"BIH", flag:"🇧🇦", size:20, type:"team"},
+  {name:"Brazil",                code:"BRA", flag:"🇧🇷", size:20, type:"team"},
+  {name:"Canada",                code:"CAN", flag:"🇨🇦", size:20, type:"team"},
+  {name:"Cape Verde",            code:"CPV", flag:"🇨🇻", size:20, type:"team"},
+  {name:"Colombia",              code:"COL", flag:"🇨🇴", size:20, type:"team"},
+  {name:"Côte d'Ivoire",         code:"CIV", flag:"🇨🇮", size:20, type:"team"},
+  {name:"Croatia",               code:"CRO", flag:"🇭🇷", size:20, type:"team"},
+  {name:"Curaçao",               code:"CUW", flag:"🇨🇼", size:20, type:"team"},
+  {name:"Czechia",               code:"CZE", flag:"🇨🇿", size:20, type:"team"},
+  {name:"DR Congo",              code:"COD", flag:"🇨🇩", size:20, type:"team"},
+  {name:"Ecuador",               code:"ECU", flag:"🇪🇨", size:20, type:"team"},
+  {name:"Egypt",                 code:"EGY", flag:"🇪🇬", size:20, type:"team"},
+  {name:"England",               code:"ENG", flag:"🏴", size:20, type:"team"},
+  {name:"France",                code:"FRA", flag:"🇫🇷", size:20, type:"team"},
+  {name:"Germany",               code:"GER", flag:"🇩🇪", size:20, type:"team"},
+  {name:"Ghana",                 code:"GHA", flag:"🇬🇭", size:20, type:"team"},
+  {name:"Haiti",                 code:"HAI", flag:"🇭🇹", size:20, type:"team"},
+  {name:"Iran",                  code:"IRN", flag:"🇮🇷", size:20, type:"team"},
+  {name:"Iraq",                  code:"IRQ", flag:"🇮🇶", size:20, type:"team"},
+  {name:"Japan",                 code:"JPN", flag:"🇯🇵", size:20, type:"team"},
+  {name:"Jordan",                code:"JOR", flag:"🇯🇴", size:20, type:"team"},
+  {name:"Mexico",                code:"MEX", flag:"🇲🇽", size:20, type:"team"},
+  {name:"Morocco",               code:"MAR", flag:"🇲🇦", size:20, type:"team"},
+  {name:"Netherlands",           code:"NED", flag:"🇳🇱", size:20, type:"team"},
+  {name:"New Zealand",           code:"NZL", flag:"🇳🇿", size:20, type:"team"},
+  {name:"Norway",                code:"NOR", flag:"🇳🇴", size:20, type:"team"},
+  {name:"Panama",                code:"PAN", flag:"🇵🇦", size:20, type:"team"},
+  {name:"Paraguay",              code:"PAR", flag:"🇵🇾", size:20, type:"team"},
+  {name:"Portugal",              code:"POR", flag:"🇵🇹", size:20, type:"team"},
+  {name:"Qatar",                 code:"QAT", flag:"🇶🇦", size:20, type:"team"},
+  {name:"Saudi Arabia",          code:"KSA", flag:"🇸🇦", size:20, type:"team"},
+  {name:"Scotland",              code:"SCO", flag:"🏴", size:20, type:"team"},
+  {name:"Senegal",               code:"SEN", flag:"🇸🇳", size:20, type:"team"},
+  {name:"South Africa",          code:"RSA", flag:"🇿🇦", size:20, type:"team"},
+  {name:"South Korea",           code:"KOR", flag:"🇰🇷", size:20, type:"team"},
+  {name:"Spain",                 code:"ESP", flag:"🇪🇸", size:20, type:"team"},
+  {name:"Sweden",                code:"SWE", flag:"🇸🇪", size:20, type:"team"},
+  {name:"Switzerland",           code:"SUI", flag:"🇨🇭", size:20, type:"team"},
+  {name:"Tunisia",               code:"TUN", flag:"🇹🇳", size:20, type:"team"},
+  {name:"Turkey",                code:"TUR", flag:"🇹🇷", size:20, type:"team"},
+  {name:"United States",         code:"USA", flag:"🇺🇸", size:20, type:"team"},
+  {name:"Uruguay",               code:"URU", flag:"🇺🇾", size:20, type:"team"},
+  {name:"Uzbekistan",            code:"UZB", flag:"🇺🇿", size:20, type:"team"},
+  {name:"Coca-Cola Stickers",    code:"COKE",   flag:"🥤", size:12, type:"coke"}
+];
+var SECTIONS = [];
+(function(){
+  var pos=0;
+  for(var k=0;k<SECTION_DEFS.length;k++){
+    var d=SECTION_DEFS[k];
+    SECTIONS.push({si:k, type:d.type, name:d.name, code:d.code, flag:d.flag,
+                   start:pos, end:pos+d.size-1});
+    pos+=d.size;
+  }
+})();
+function secOf(i){
+  for(var s=0;s<SECTIONS.length;s++) if(i>=SECTIONS[s].start && i<=SECTIONS[s].end) return s;
+  return 0;
+}
+function fullCode(i){ var s=SECTIONS[secOf(i)]; return s.code+" "+(i-s.start+1); }
+function stickerKind(i){
+  var s=SECTIONS[secOf(i)], n=i-s.start+1;
+  if(s.type==="team") return n===1?"Team logo":(n===13?"Team photo":"Player");
+  if(s.code==="FWC") return "World Cup history";
+  if(s.code==="PANINI") return "Official emblem";
+  return "Coca-Cola sticker";
+}
+function displayName(sec){ return state.teams[sec.si] || sec.name; }
+function sectionTitle(sec){ return sec.flag+" "+displayName(sec); }
+
+/* ============ VIEW SWITCHING ============ */
+function showView(v){
+  document.querySelectorAll(".view").forEach(function(el){el.classList.remove("active");});
+  document.getElementById("view-"+v).classList.add("active");
+  document.querySelectorAll("nav button").forEach(function(b){
+    b.classList.toggle("on", b.dataset.v===v);
+  });
+  if(v==="trade") renderTrade();
+  if(v==="stats") renderStats();
+  window.scrollTo(0,0);
+}
+
+/* ============ ALBUM RENDER ============ */
+var secEls = {};   // section index -> {wrap, body, built, prog, chips:{}}
+var curFilter = "all";
+
+function renderAlbum(){
+  var host = document.getElementById("sections");
+  host.innerHTML = "";
+  secEls = {};
+  SECTIONS.forEach(function(sec, si){
+    var wrap = document.createElement("div");
+    wrap.className = "section";
+    var open = !state.collapsed[si] && si===0; // opening pages start open
+    if(open) wrap.classList.add("open");
+
+    var head = document.createElement("div");
+    head.className = "sechead";
+    head.innerHTML =
+      '<span class="arrow">▶</span>'+
+      '<span class="name"></span>'+
+      (sec.type==="team" ? '<button class="edit" title="Rename">✏️</button>' : '')+
+      '<span class="range">'+sec.code+'</span>'+
+      '<span class="secprog">0/0</span>';
+    head.querySelector(".name").textContent = sectionTitle(sec);
+    head.addEventListener("click", function(e){
+      if(e.target.classList.contains("edit")){ renameTeam(sec, si); return; }
+      toggleSection(si);
+    });
+
+    var body = document.createElement("div");
+    body.className = "secbody";
+
+    wrap.appendChild(head);
+    wrap.appendChild(body);
+    host.appendChild(wrap);
+
+    secEls[si] = {wrap:wrap, head:head, body:body, built:false, chips:{}};
+    if(open){ buildChips(si); }
+    updateSecProg(si);
+  });
+}
+
+function buildChips(si){
+  var rec = secEls[si]; if(rec.built) return;
+  var sec = SECTIONS[si];
+  rec.body.innerHTML = "";
+  if(sec.type==="coke"){
+    var note = document.createElement("div");
+    note.className = "cokebox";
+    note.textContent = "🥤 These 12 stickers are not in normal packs — find them under the labels of specially marked Coca-Cola bottles!";
+    rec.body.appendChild(note);
+  }
+  var grid = document.createElement("div");
+  grid.className = "grid";
+  for(var i=sec.start;i<=sec.end;i++){
+    grid.appendChild(makeChip(i, si));
+  }
+  rec.body.appendChild(grid);
+  rec.built = true;
+}
+
+function makeChip(i, si){
+  var b = document.createElement("button");
+  b.className = "chip";
+  b.dataset.idx = i;
+  b.innerHTML = '<span class="numlbl"></span>'+
+    '<span class="star">⭐</span>'+
+    '<span class="spare"></span>'+
+    '<span class="info">i</span>';
+  b.querySelector(".numlbl").textContent = String(i - SECTIONS[si].start + 1);
+  b.addEventListener("click", function(e){
+    if(e.target.classList.contains("info")){ openDetail(i); return; }
+    setCount(i, getCount(i)+1);   // tap = "I pulled this sticker"
+    save(); afterChange(i, si);
+  });
+  secEls[si].chips[i] = b;
+  paintChip(i);
+  return b;
+}
+
+function paintChip(i){
+  // find chip
+  var b=null;
+  for(var si in secEls){ if(secEls[si].chips[i]){ b=secEls[si].chips[i]; break; } }
+  if(!b) return;
+  var c = getCount(i);
+  b.classList.toggle("owned", c>0);
+  b.querySelector(".star").style.display = isStar(i)?"block":"none";
+  var sp = b.querySelector(".spare");
+  if(c>1){ sp.style.display="block"; sp.textContent="+"+(c-1); }
+  else { sp.style.display="none"; }
+}
+
+function afterChange(i, si){
+  paintChip(i);
+  if(si!=null) updateSecProg(si);
+  updateHeader();
+  applyFilterToChip(i);
+}
+
+function updateSecProg(si){
+  var sec = SECTIONS[si], owned=0, total=sec.end-sec.start+1;
+  for(var i=sec.start;i<=sec.end;i++) if(getCount(i)>0) owned++;
+  var el = secEls[si].head.querySelector(".secprog");
+  el.textContent = owned+"/"+total;
+  el.classList.toggle("done", owned===total);
+}
+
+function toggleSection(si){
+  var rec = secEls[si];
+  var open = rec.wrap.classList.toggle("open");
+  state.collapsed[si] = !open;
+  if(open) buildChips(si);
+  save();
+}
+
+function renameTeam(sec, si){
+  var cur = displayName(sec);
+  var nn = prompt("Rename this team (just a nickname for you):", cur);
+  if(nn!=null){
+    nn = nn.trim();
+    if(nn) state.teams[sec.si]=nn; else delete state.teams[sec.si];
+    secEls[si].head.querySelector(".name").textContent = sectionTitle(sec);
+    save();
+  }
+}
+
+/* ----- header ----- */
+function ownedCount(){ var n=0; for(var k in state.counts) if(state.counts[k]>0) n++; return n; }
+function spareCount(){ var n=0; for(var k in state.counts){ var c=state.counts[k]; if(c>1) n+=c-1; } return n; }
+function updateHeader(){
+  var owned = ownedCount();
+  var pct = Math.round(owned/TOTAL*100);
+  document.getElementById("hdrFill").style.width = pct+"%";
+  document.getElementById("hdrPct").textContent = pct+"%";
+  document.getElementById("hdrCount").textContent = owned+" / "+TOTAL;
+}
+
+/* ============ FILTERS ============ */
+function chipMatches(i){
+  var c = getCount(i);
+  if(curFilter==="all") return true;
+  if(curFilter==="owned") return c>0;
+  if(curFilter==="need") return c===0;
+  if(curFilter==="spare") return c>1;
+  if(curFilter==="star") return isStar(i);
+  return true;
+}
+function setFilter(f){
+  curFilter = f;
+  document.querySelectorAll(".fchip").forEach(function(b){
+    b.classList.toggle("on", b.dataset.f===f);
+  });
+  // make sure every section is built so filtering is complete
+  SECTIONS.forEach(function(sec,si){
+    if(f!=="all"){ secEls[si].wrap.classList.add("open"); buildChips(si); }
+  });
+  SECTIONS.forEach(function(sec,si){
+    var visible=0;
+    for(var i=sec.start;i<=sec.end;i++){
+      var b = secEls[si].chips[i];
+      if(!b) continue;
+      var ok = chipMatches(i);
+      b.style.display = ok?"":"none";
+      if(ok) visible++;
+    }
+    if(f!=="all"){
+      secEls[si].wrap.style.display = visible?"":"none";
+    } else {
+      secEls[si].wrap.style.display = "";
+      // restore saved collapse state
+      var open = (si===0 && !state.collapsed[si]) || (state.collapsed[si]===false);
+      secEls[si].wrap.classList.toggle("open", !state.collapsed[si] && (si===0||state.collapsed[si]===false));
+    }
+  });
+}
+function applyFilterToChip(i){
+  if(curFilter==="all") return;
+  for(var si in secEls){
+    var b = secEls[si].chips[i];
+    if(b){ b.style.display = chipMatches(i)?"":"none"; }
+  }
+}
+
+/* ============ SEARCH ============ */
+function doSearch(){
+  var q = document.getElementById("search").value.trim().toUpperCase().replace(/\s+/g," ");
+  if(!q) return;
+  var m = q.match(/^([A-Z]+)\s*([0-9]+)$/);
+  if(!m){ alert("Type a sticker code, like ARG 10 or FWC 5."); return; }
+  var code=m[1], num=parseInt(m[2],10), tsi=-1;
+  for(var s=0;s<SECTIONS.length;s++){ if(SECTIONS[s].code===code){ tsi=s; break; } }
+  if(tsi<0){ alert('No section has the code "'+code+'". Check the code shown on each section header.'); return; }
+  var sec=SECTIONS[tsi], size=sec.end-sec.start+1;
+  if(num<1 || num>size){ alert(sec.name+" only has "+size+" sticker"+(size>1?"s":"")+" (1 to "+size+")."); return; }
+  var idx=sec.start+num-1;
+  secEls[tsi].wrap.classList.add("open");
+  buildChips(tsi);
+  var b = secEls[tsi].chips[idx];
+  b.scrollIntoView({behavior:"smooth", block:"center"});
+  b.classList.remove("flash"); void b.offsetWidth; b.classList.add("flash");
+  setTimeout(function(){ openDetail(idx); }, 350);
+}
+
+/* ============ DETAIL SHEET ============ */
+var detailIdx = -1;
+function openDetail(i){
+  detailIdx = i;
+  document.getElementById("dNum").textContent = fullCode(i);
+  var sec=null, si=-1;
+  for(var s=0;s<SECTIONS.length;s++){ if(i>=SECTIONS[s].start&&i<=SECTIONS[s].end){sec=SECTIONS[s];si=s;break;} }
+  document.getElementById("dTitle").textContent = stickerKind(i);
+  document.getElementById("dSection").textContent = sectionTitle(sec);
+  refreshDetail();
+  document.getElementById("detailOverlay").classList.add("show");
+}
+function refreshDetail(){
+  var c = getCount(detailIdx);
+  var t = c===0 ? "You don't have this yet" :
+          c===1 ? "✅ You have it (1)" :
+          "✅ You have it + "+(c-1)+" spare"+(c-1>1?"s":"");
+  document.getElementById("dHave").textContent = t;
+  document.getElementById("dStar").classList.toggle("on", isStar(detailIdx));
+}
+function stepDetail(d){
+  setCount(detailIdx, getCount(detailIdx)+d);
+  save(); refreshDetail();
+  var si=-1; for(var s=0;s<SECTIONS.length;s++){ if(detailIdx>=SECTIONS[s].start&&detailIdx<=SECTIONS[s].end){si=s;break;} }
+  afterChange(detailIdx, si);
+}
+function toggleDetailStar(){
+  if(isStar(detailIdx)) delete state.stars[detailIdx];
+  else state.stars[detailIdx]=1;
+  save(); refreshDetail(); paintChip(detailIdx);
+}
+function closeDetail(){ document.getElementById("detailOverlay").classList.remove("show"); }
+
+/* ============ TRADE ============ */
+function renderTrade(){
+  var gives=[], needs=[];
+  for(var i=0;i<TOTAL;i++){
+    var c=getCount(i);
+    if(c>1) gives.push(i);
+    if(c===0) needs.push(i);
+  }
+  document.getElementById("tradeSummary").textContent =
+    "🎁 You can give away "+gives.length+" different sticker"+(gives.length===1?"":"s")+
+    "  ·  🔍 You still need "+needs.length;
+
+  var g = document.getElementById("giveList");
+  g.innerHTML = "<b>🎁 My spares — offer these:</b><br>";
+  if(!gives.length){ g.innerHTML += '<span class="emptynote">No doubles yet.</span>'; }
+  else gives.forEach(function(i){
+    var c=getCount(i);
+    var cls = isStar(i)?"pill star":"pill give";
+    g.innerHTML += '<span class="'+cls+'">'+(isStar(i)?"⭐ ":"")+fullCode(i)+" ×"+(c-1)+"</span>";
+  });
+
+  var n = document.getElementById("needList");
+  n.innerHTML = "<b>🔍 I still need — ask for these:</b><br>";
+  if(!needs.length){ n.innerHTML += '<span class="emptynote">🏆 Album complete — nothing needed!</span>'; }
+  else {
+    var shown = needs.slice(0,300);
+    shown.forEach(function(i){
+      n.innerHTML += '<span class="pill need">'+fullCode(i)+'</span>';
+    });
+    if(needs.length>300) n.innerHTML += '<span class="pill">+'+(needs.length-300)+' more</span>';
+  }
+}
+
+/* ----- swap code: 2 bits per sticker, 248 bytes, base64 ----- */
+function stateValue(i){ var c=getCount(i); return c===0?0:(c===1?1:2); }
+function buildCode(){
+  var bytes = new Uint8Array(248);
+  for(var i=0;i<TOTAL;i++){
+    bytes[i>>2] |= stateValue(i) << ((i&3)*2);
+  }
+  var s=""; for(var j=0;j<248;j++) s+=String.fromCharCode(bytes[j]);
+  return "P26-"+btoa(s);
+}
+function parseCode(code){
+  code=(code||"").trim();
+  var p=code.indexOf("P26-");
+  if(p<0) return null;
+  code=code.slice(p+4);
+  try{
+    var s=atob(code);
+    if(s.length!==248) return null;
+    var v=new Uint8Array(TOTAL);
+    for(var i=0;i<TOTAL;i++){
+      v[i]=(s.charCodeAt(i>>2) >> ((i&3)*2)) & 3;
+    }
+    return v;
+  }catch(e){ return null; }
+}
+
+function showMyCode(){
+  var code = buildCode();
+  document.getElementById("myCodeText").value = code;
+  document.getElementById("myCodeArea").style.display="block";
+  var holder = document.getElementById("myQrImg");
+  try{
+    holder.innerHTML = '<img alt="swap QR code" src="'+qrDataURL(code,6,4)+'">';
+  }catch(e){
+    holder.innerHTML = '<div class="emptynote">Use the text code below.</div>';
+  }
+}
+function copyCode(){
+  var t=document.getElementById("myCodeText");
+  t.select(); t.setSelectionRange(0,99999);
+  try{ document.execCommand("copy"); }catch(e){}
+  if(navigator.clipboard){ navigator.clipboard.writeText(t.value).catch(function(){}); }
+  alert("Swap code copied! Send it to your friend.");
+}
+
+function matchFromText(){
+  var v = parseCode(document.getElementById("friendCode").value);
+  if(!v){ alert("That doesn't look like a valid swap code (it should start with P26-)."); return; }
+  doMatch(v);
+}
+function doMatch(friend){
+  var friendGives=[], iGive=[];
+  for(var i=0;i<TOTAL;i++){
+    var mine = stateValue(i);
+    if(friend[i]===2 && mine===0) friendGives.push(i);   // they have spare, I need
+    if(mine===2 && friend[i]===0) iGive.push(i);          // I have spare, they need
+  }
+  var html = "";
+  html += '<div style="font-weight:800;margin-bottom:4px;">🎁 Your friend can give YOU ('+friendGives.length+'):</div>';
+  if(!friendGives.length) html += '<span class="emptynote">Nothing matches right now.</span>';
+  else friendGives.forEach(function(i){ html += '<span class="pill need">'+fullCode(i)+'</span>'; });
+  html += '<div style="font-weight:800;margin:10px 0 4px;">🤝 YOU can give your friend ('+iGive.length+'):</div>';
+  if(!iGive.length) html += '<span class="emptynote">Nothing matches right now.</span>';
+  else iGive.forEach(function(i){
+    html += '<span class="pill '+(isStar(i)?"star":"give")+'">'+(isStar(i)?"⭐ ":"")+fullCode(i)+'</span>';
+  });
+  document.getElementById("matchResult").innerHTML = html;
+}
+
+/* ----- QR scanner (uses the browser's built-in barcode detector) ----- */
+var scanStream=null, scanning=false, scanDetector=null;
+function startScan(){
+  if(!("BarcodeDetector" in window)){
+    alert("This browser can't scan QR codes. No problem — ask your friend for their swap code and paste it in the box below instead.");
+    return;
+  }
+  scanDetector = new BarcodeDetector({formats:["qr_code"]});
+  document.getElementById("scanOverlay").classList.add("show");
+  document.getElementById("scanMsg").textContent="Looking for a code…";
+  var video=document.getElementById("scanVideo");
+  navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"}})
+    .then(function(stream){
+      scanStream=stream; scanning=true;
+      video.srcObject=stream; video.setAttribute("playsinline",true);
+      video.play();
+      requestAnimationFrame(scanLoop);
+    })
+    .catch(function(err){
+      document.getElementById("scanMsg").textContent="Couldn't open the camera. Please paste the code instead.";
+    });
+}
+function scanLoop(){
+  if(!scanning) return;
+  var video=document.getElementById("scanVideo");
+  if(video.readyState!==video.HAVE_ENOUGH_DATA){ requestAnimationFrame(scanLoop); return; }
+  scanDetector.detect(video).then(function(codes){
+    if(!scanning) return;
+    for(var i=0;i<codes.length;i++){
+      var raw=codes[i].rawValue, v=parseCode(raw);
+      if(v){
+        stopScan();
+        document.getElementById("friendCode").value=raw;
+        doMatch(v);
+        showView("trade");
+        return;
+      }
+    }
+    requestAnimationFrame(scanLoop);
+  }).catch(function(){ requestAnimationFrame(scanLoop); });
+}
+function stopScan(){
+  scanning=false;
+  if(scanStream){ scanStream.getTracks().forEach(function(t){t.stop();}); scanStream=null; }
+  document.getElementById("scanOverlay").classList.remove("show");
+}
+
+/* ============ STATS ============ */
+function renderStats(){
+  var owned=ownedCount(), spare=spareCount(), star=0;
+  for(var k in state.stars){ if(state.stars[k]) star++; }
+  document.getElementById("stOwned").textContent=owned;
+  document.getElementById("stNeed").textContent=TOTAL-owned;
+  document.getElementById("stSpare").textContent=spare;
+  document.getElementById("stStar").textContent=star;
+
+  document.getElementById("inPacks").value=state.packs;
+  document.getElementById("inPrice").value=state.price;
+  document.getElementById("inCur").value=state.currency;
+  updateCost();
+
+  var host=document.getElementById("secStats");
+  host.innerHTML="";
+  SECTIONS.forEach(function(sec){
+    var o=0,tot=sec.end-sec.start+1;
+    for(var i=sec.start;i<=sec.end;i++) if(getCount(i)>0) o++;
+    var pct=Math.round(o/tot*100);
+    var d=document.createElement("div");
+    d.style.marginBottom="9px";
+    d.innerHTML='<div class="seclist"><span>'+sectionTitle(sec)+'</span><span>'+o+'/'+tot+'</span></div>'+
+      '<div class="minibar"><div class="minifill" style="width:'+pct+'%"></div></div>';
+    host.appendChild(d);
+  });
+}
+function savePacks(){
+  state.packs=Math.max(0, parseInt(document.getElementById("inPacks").value,10)||0);
+  state.price=Math.max(0, parseFloat(document.getElementById("inPrice").value)||0);
+  state.currency=(document.getElementById("inCur").value||"$").slice(0,3);
+  save(); updateCost();
+}
+function updateCost(){
+  var p=state.packs, spend=(p*state.price), ripped=p*7;
+  document.getElementById("costLine").textContent=
+    p+" packs ≈ "+ripped+" stickers ripped  ·  spent ≈ "+state.currency+spend.toFixed(2);
+  var missing=TOTAL-ownedCount();
+  var msg;
+  if(p===0) msg="🛒 Start ripping! Aim for about 150 packs (~3 boxes) — that fills most of the album.";
+  else if(p<120) msg="📦 Keep going — aim for about 150 packs (~3 boxes) before you switch to trading.";
+  else if(p<=160) msg="🎯 Sweet spot! New stickers get rare around here. Stop buying packs and start TRADING your doubles.";
+  else msg="🔄 You're past the pack sweet spot — trading spares is now much cheaper than buying more packs.";
+  if(missing===0) msg="🏆 Album complete — incredible job!";
+  else if(missing<=50) msg="🏁 Final stretch! You need "+missing+". You can order exact numbers from Panini's official Missing Sticker Service.";
+  document.getElementById("adviceLine").textContent=msg;
+}
+
+/* ============ BACKUP ============ */
+function exportBackup(){
+  var data=JSON.stringify(state);
+  var blob=new Blob([data],{type:"application/json"});
+  var a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="panini-wc2026-backup.json";
+  a.click();
+}
+function importBackup(ev){
+  var f=ev.target.files[0]; if(!f) return;
+  var r=new FileReader();
+  r.onload=function(){
+    try{
+      var o=JSON.parse(r.result);
+      state.counts=o.counts||{}; state.stars=o.stars||{}; state.teams=o.teams||{};
+      state.collapsed=o.collapsed||{}; state.packs=o.packs||0;
+      state.price=(o.price!=null?o.price:1); state.currency=o.currency||"$";
+      save(); renderAlbum(); updateHeader();
+      alert("Backup loaded!");
+    }catch(e){ alert("That file could not be read."); }
+  };
+  r.readAsText(f);
+}
+function resetAll(){
+  if(confirm("Start over? This erases everything in your album on this device.")){
+    state={counts:{},stars:{},teams:{},collapsed:{},packs:0,price:state.price,currency:state.currency};
+    save(); renderAlbum(); updateHeader();
+  }
+}
+
+/* ============ INIT ============ */
+load();
+renderAlbum();
+updateHeader();
+document.getElementById("search").addEventListener("keydown",function(e){
+  if(e.key==="Enter") doSearch();
+});
+</script>
+</body>
+</html>
