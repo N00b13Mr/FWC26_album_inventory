@@ -1,4 +1,4 @@
-This is a single, fully offline HTML file — open it in any browser (on a phone, tap the share menu → "Add to Home Screen" so a kid can use it like a real app). Everything saves automatically on the device, plus there's a backup file option.
+This is a single, fully online (no install, and the tracker still saves each device's collection locally.) — open it in any browser (on a phone, tap the share menu → "Add to Home Screen" so a kid can use it like a real app). Everything saves automatically on the device, plus there's a backup file option.
 What it does, and how the source material shaped it:
 
 992 stickers, kid-simple input. Organized into Opening Pages, 48 team blocks of 20, and a separate Coca-Cola section. The core action: tap a sticker once each time you pull it from a pack — first tap = got it, more taps = doubles. The Coca-Cola section carries a note that those 12 come from marked bottles, not packs (Phase 4).
